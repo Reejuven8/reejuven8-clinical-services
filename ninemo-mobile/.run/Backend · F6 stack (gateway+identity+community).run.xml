@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Backend · F6 stack (gateway+identity+community)" type="CompoundRunConfigurationType">
+    <toRun name="Backend · identity-abha 8081" type="ShConfigurationType" />
+    <toRun name="Backend · community 8086" type="ShConfigurationType" />
+    <toRun name="Backend · api-gateway 8080" type="ShConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>

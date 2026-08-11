@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend-test:
+    name: Maven Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+      - name: Run all Java tests
+        working-directory: ninemo-backend
+        run: mvn clean test -Dnet.bytebuddy.experimental=true --no-transfer-progress
+
+  python-test:
+    name: Python Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install dependencies
+        working-directory: ninemo-backend/services/ai-parsing-service
+        run: pip install -r requirements.txt pytest
+      - name: Run pytest
+        working-directory: ninemo-backend/services/ai-parsing-service
+        run: pytest tests/ -v
+
+  build-java-images:
+    name: Build Java Docker Images
+    needs: backend-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        service:
+          - api-gateway
+          - identity-abha-service
+          - health-data-service
+          - notification-service
+          - ninemo-clinical-service
+          - ninemo-community-service
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+      - name: Build ${{ matrix.service }} image
+        working-directory: ninemo-backend/services/${{ matrix.service }}
+        run: docker build -t ninemo/${{ matrix.service }}:${{ github.sha }} .
+
+  build-python-image:
+    name: Build Python Docker Image
+    needs: python-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build ai-parsing-service image
+        working-directory: ninemo-backend/services/ai-parsing-service
+        run: docker build -t ninemo/ai-parsing-service:${{ github.sha }} .

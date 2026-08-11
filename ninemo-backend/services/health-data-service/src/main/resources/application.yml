@@ -1,0 +1,48 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: health-data-service
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://reejuven8:dev_password@localhost:27017/reejuven8?authSource=admin}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: health-data-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.reejuven8.*"
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:reejuven8}
+    password: ${RABBITMQ_PASSWORD:dev_password}
+aws:
+  region: ${AWS_REGION:ap-south-1}
+  s3:
+    health-bucket: ${S3_HEALTH_BUCKET:reejuven8-health}
+    profiles-bucket: ${S3_PROFILES_BUCKET:reejuven8-profiles}
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_ENDPOINT:http://localhost:9411/api/v2/spans}

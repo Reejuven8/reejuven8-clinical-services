@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Backend · all Java services" type="CompoundRunConfigurationType">
+    <toRun name="Backend · identity-abha 8081" type="ShConfigurationType" />
+    <toRun name="Backend · health-data 8082" type="ShConfigurationType" />
+    <toRun name="Backend · clinical 8084" type="ShConfigurationType" />
+    <toRun name="Backend · notification 8085" type="ShConfigurationType" />
+    <toRun name="Backend · community 8086" type="ShConfigurationType" />
+    <toRun name="Backend · api-gateway 8080" type="ShConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>

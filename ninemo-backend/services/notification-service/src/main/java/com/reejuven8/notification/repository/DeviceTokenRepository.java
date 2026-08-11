@@ -1,0 +1,14 @@
+package com.reejuven8.notification.repository;
+
+import com.reejuven8.notification.model.entity.DeviceToken;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+public interface DeviceTokenRepository extends JpaRepository<DeviceToken, UUID> {
+    List<DeviceToken> findByUserId(UUID userId);
+    Optional<DeviceToken> findByFcmToken(String fcmToken);
+    void deleteByFcmToken(String fcmToken);
+}

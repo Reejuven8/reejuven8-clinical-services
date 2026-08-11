@@ -1,0 +1,158 @@
+Epic 1: Reejuven8 Identity & ABHA Interoperability
+Description: Building the foundational bridge to the Ayushman Bharat Digital Mission (ABDM) to handle secure user authentication, identity linking, and consent management.
+
+User Story 1.1: The "Scan & Share" Onboarding
+As a patient, I want to scan my ABHA QR code to instantly create my profile so that I can skip long hospital registration queues.
+
+Acceptance Criteria:
+
+Must securely interface with the ABDM Gateway to handle identity callbacks.
+
+Must store strict ACID-compliant identity data natively in the relational database.
+
+Must automatically assign the PATIENT role upon successful creation.
+
+Technical Tasks:
+
+Build React/Angular frontend component for QR data capture and submission.
+
+Create Spring Boot API endpoint POST /api/v1/identity/abha/scan.
+
+Implement RSA encryption (Curve25519) logic to securely transmit the Aadhaar payload.
+
+Write PostgreSQL INSERT query targeting the users table to store the id, abha_address, phone_number, and role.
+
+User Story 1.2: Unified Consent Management
+As a patient, I want a centralized hub to approve or revoke doctor access to my health records, ensuring I maintain absolute control over my data privacy.
+
+Acceptance Criteria:
+
+Must successfully manage Health Information User (HIU) and Health Information Provider (HIP) consent flows.
+
+Must track and enforce the precise time-bound nature of the government consent.
+
+Technical Tasks:
+
+Develop Spring Boot CallbackController in the identity-abha-service to asynchronously receive gateway approvals.
+
+Configure Apache Kafka producer for the abdm.consent.granted topic to create a permanent, time-stamped audit trail.
+
+Write PostgreSQL query to update the consent_status (GRANTED, REVOKED, EXPIRED), granted_at, and expires_at in the user_consents table.
+
+Epic 2: Reejuven8 Clinical Data Lake & AI Engine
+Description: Establishing the polyglot storage infrastructure and the intelligent parsing workers that translate messy, real-world data into structured clinical insights.
+
+User Story 2.1: The AI Medical Scribe
+As a doctor, I want the system to listen to my consultation and automatically generate structured case notes so that I can maintain eye contact with my patient instead of typing.
+
+Acceptance Criteria:
+
+Must utilize custom Small Language Models (SLMs) fine-tuned for Indian accents and "Hinglish".
+
+Must extract actionable entities (e.g., specific drug names and dosages).
+
+Technical Tasks:
+
+Deploy a Python (FastAPI) microservice to host the audio ingestion and inference pipeline.
+
+Build a React/Angular UI dashboard optimized for zero-latency review and editing of the generated text.
+
+Format the finalized prescription data strictly into FHIR JSON bundles.
+
+User Story 2.2: Unstructured Data OCR
+As an administrator, I want the system to read uploaded photos of physical lab reports and extract vital data points automatically.
+
+Acceptance Criteria:
+
+Must safely store the original physical files in an object storage vault.
+
+Must leverage Optical Character Recognition (OCR) and Medical Named Entity Recognition (NER).
+
+Technical Tasks:
+
+Configure AWS S3 bucket for secure, encrypted file uploads.
+
+Set up a RabbitMQ worker queue for the document.unstructured.uploaded event to distribute CPU-intensive OCR tasks.
+
+Integrate AWS Textract API within the ai-parsing-service to pull key-value pairs.
+
+Write MongoDB query to upsert the extracted clinical observations into the fhir_resources collection.
+
+Epic 3: NineMo Smart Pregnancy Engine (Antenatal)
+Description: The core gestational logic that drives the active timeline, triages symptoms, and manages medical milestones.
+
+User Story 3.1: The Dynamic Timeline
+As an expecting mother, I want to see a dynamic weekly feed of my baby's development based on my specific due date so I know exactly what to expect.
+
+Acceptance Criteria:
+
+Must accurately calculate the Estimated Due Date (EDD) using inputs like Last Menstrual Period (LMP) or Ultrasound Date.
+
+Must automatically generate a calendar of standard Indian medical milestones (e.g., 20-week Anomaly Scan).
+
+Technical Tasks:
+
+Build Java TimelineService to execute the date calculation logic and output structured milestone JSONs.
+
+Implement Redux Toolkit or React Query in the frontend for asynchronous state management of the timeline.
+
+Write PostgreSQL query to read lmp_date and edd_date from the pregnancy_profiles table.
+
+User Story 3.2: Context-Aware Symptom Triage
+As an expecting mother, I want the system to alert me if my logged symptoms are dangerous for my specific gestational week.
+
+Acceptance Criteria:
+
+Must evaluate logged daily symptoms directly against the active gestational week.
+
+Must trigger high-priority alerts for severe conditions (e.g., flagging high BP as Preeclampsia risk).
+
+Technical Tasks:
+
+Develop a Java Rule Engine (e.g., Drools) inside the ninemo-clinical-service to process symptom and vitals thresholds.
+
+Create a RabbitMQ producer for the clinical.risk.detected topic to trigger immediate routing.
+
+Build Spring Boot asynchronous workers in the notification-service to dispatch urgent WhatsApp/SMS alerts via external APIs (Twilio/Gupshup).
+
+Epic 4: NineMo Intelligent Health Locker
+Description: The aggregation layer that visualizes parsed AI data specifically for the maternity use case.
+
+User Story 4.1: The Doctor's Summary Card
+As a doctor, I want a single-page digital summary of my patient's pregnancy so I can quickly review their status without flipping through bulky physical files.
+
+Acceptance Criteria:
+
+Must display the current gestational week, cumulative weight gain, medication history, and recent scan results.
+
+Must dynamically pull the latest parsed data points from the underlying FHIR data lake.
+
+Technical Tasks:
+
+Create a GET /api/v1/ninemo/summary-card endpoint.
+
+Construct a complex MongoDB aggregation pipeline to query both the fhir_resources and ninemo_timeline_feed collections simultaneously.
+
+Build a React UI view heavily optimized for rapid scanning and minimal clicks.
+
+Epic 5: NineMo Pediatric Transition (Postnatal)
+Description: The logic dictating the application's graceful pivot from pregnancy tracking to early childhood management.
+
+User Story 5.1: Seamless Child Mode & Growth Tracking
+As a new parent, I want the app to automatically transition after my delivery and track my child's growth against standard metrics.
+
+Acceptance Criteria:
+
+Must automatically lock the pregnancy timeline and activate "Child Mode" upon the logged delivery date.
+
+Must plot the child's height and weight against standard WHO Growth Charts using Z-Scores.
+
+Must trigger pediatric alerts if the plotted metrics drop across two major percentile lines.
+
+Technical Tasks:
+
+Implement state transition logic in the backend, triggered by an UPDATE query setting the delivery_date in the PostgreSQL pregnancy_profiles table.
+
+Build a mathematical mapping algorithm in Java to calculate and output the correct WHO percentile metrics.
+
+Develop a React chart component (e.g., using Recharts or D3.js) to visually plot the Z-score curves and the child's data points.

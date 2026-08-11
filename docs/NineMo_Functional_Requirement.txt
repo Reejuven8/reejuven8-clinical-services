@@ -1,0 +1,126 @@
+NineMo Functional Requirements Document (FRD)
+Pillar 1: The "Smart" Pregnancy Journey (Antenatal)
+This module requires a heavy focus on the gestational timeline and clinical triage logic.
+
+Onboarding & Configuration Engine
+
+
+Date Calculation: The system must calculate the Estimated Due Date (EDD) and current gestational age (Weeks + Days) based on user input of either Last Menstrual Period (LMP), Ultrasound Date, or IVF Transfer Date.
+
+
+Maternal Profiling: The system must capture starting metrics (Age, Height, Pre-pregnancy Weight, Blood Group) to calculate baseline BMI and establish personalized weight-gain targets.
+
+
+Risk Stratification: The system must allow users to flag pre-existing conditions (e.g., PCOS, Hypothyroidism, Type-2 Diabetes) to adjust timeline alerts and symptom triage logic.
+
+The Dynamic Timeline Engine
+
+
+Weekly Content Delivery: The system must dynamically render weekly fetal development data and anticipated maternal bodily changes based on the exact gestational week.
+
+
+Scan & Test Auto-Scheduling: The system must automatically generate a calendar of standard Indian medical milestones (e.g., 12-week NT Scan, 20-week Anomaly Scan, 24-week GTT, 28-week TT Injection) mapped to the user's specific dates.
+
+
+Milestone Reminders: The system must send push notifications 7 days and 1 day prior to upcoming auto-scheduled medical milestones.
+
+Clinical Monitoring & High-Risk Tools
+
+
+Weight Tracking Engine: The system must allow users to log current weight and plot it on a graph against their personalized recommended weight-gain curve.
+
+
+Blood Pressure Triage: The system must allow manual or Bluetooth-synced BP logging. If a logged BP exceeds standard thresholds (e.g., >140/90), the system must immediately trigger a "High-Risk Alert" advising the user to contact their doctor.
+
+
+Digital Kick Counter: The system must provide a timer-based tool for tracking fetal movements in the 3rd trimester, logging the time taken to reach 10 kicks, and saving this to a historical view.
+
+
+Contraction Timer: The system must provide a tool to log the start time, end time, and intensity of contractions, automatically calculating the frequency (time between) and duration.
+
+Symptom Tracking & Triage
+
+
+Daily Symptom Logging: The system must allow users to select daily symptoms from a predefined, categorized list (e.g., Nausea, Spotting, Cramping, Swelling).
+
+
+Red-Flag Logic: The system must evaluate logged symptoms against the current gestational week to trigger appropriate hospital alerts or monitor statuses based on severity.
+
+
+Home-Care Remediation: For benign symptoms, the system must display medically verified, conservative management tips.
+
+The "Indian Context" & Holistic Care Module
+
+"Is it Safe?" Indian Diet Lookup: A searchable database where users can query local ingredients to see evidence-based safety ratings for pregnancy.
+
+
+Trimester-Specific Diet Plans: The system must serve daily/weekly meal suggestions tailored to Indian diets (Veg/Non-Veg), emphasizing specific nutrients needed for that exact week.
+
+
+Ayurvedic & Garbh Sanskar Integration: The system must offer a toggleable holistic mode featuring trimester-safe prenatal yoga routines, traditional Ayurvedic dietary guidelines, and guided meditation for mental wellness.
+
+Pillar 2: The "Intelligent" Health Locker (ABHA Core)
+This pillar dictates the data aggregator and logic layer, specifically utilizing AI and OCR capabilities.
+
+
+Automated Record Fetching: The system must automatically sync and fetch lab reports and prescriptions from the ABHA network whenever a partner lab or hospital uploads them.
+
+
+Smart Document Categorization: The system must read the metadata of incoming documents and automatically categorize them by type (e.g., Ultrasound, Prescription) and apply relevant medical tags (e.g., "Thyroid", "Diabetes").
+
+
+Vitals Extraction & Trend Engine: The system must utilize an OCR/NER pipeline to extract key metrics (e.g., Hemoglobin, Blood Sugar, TSH) from structured and unstructured reports and plot these values on a visual graph spanning the 9-month journey.
+
+
+Contextual Health Insights: The system must evaluate extracted vitals against pregnancy-specific norms and provide contextual insights (e.g., noting that a specific drop in Hemoglobin is normal hemodilution for that trimester).
+
+
+Doctor's Flash Card Generation: The system must compile a single-screen snapshot for physician review, summarizing the patient's current week, cumulative weight gain, recent abnormalities, current medications, and allergies.
+
+Pillar 3: Child Care & Pediatrics (Postnatal)
+This logic dictates the application state transition upon the birth of the child.
+
+
+Mode Transition Engine: The system must automatically lock the pregnancy timeline and switch to "Child Mode" upon the logged delivery date.
+
+
+Vaccination Tracker: The system must pre-load the government-mandated Indian Academy of Pediatrics (IAP) immunization schedule based on the child's birth date and send timely push notifications for upcoming boosters.
+
+
+Digital Certificate Storage: The system must allow users to upload physical vaccination charts and digitally map the completion of those vaccines.
+
+
+WHO Growth Tracking: The system must capture the child's height, weight, and head circumference, plot these metrics against standard WHO Growth Charts using Z-scores, and calculate the child's percentile.
+
+
+Growth Red-Flag Alerts: The system must trigger pediatric alerts if a child's plotted weight or height drops across two major percentile lines.
+
+
+Developmental Milestones Checklists: The system must provide monthly cognitive and physical checklists and trigger warning alerts if key milestones are missed by certain months.
+
+Pillar 4: Utilities & Management
+These are the transactional features requiring strictly structured database entries.
+
+
+Smart Medicine Nagger: The system must provide a pillbox feature to schedule specific medication alerts (e.g., "Take Iron before lunch").
+
+
+Prescription Inventory Tracking: The system must track the number of logged pills and trigger refill reminders when inventory runs low.
+
+
+Appointment & Document Prep: The system must sync with the user's calendar for upcoming doctor visits and trigger a reminder 1 hour prior to carry necessary documents or prepare the digital summary card.
+
+
+Customizable Hospital Bag: The system must provide a pre-set checklist for delivery day and allow users to append custom items.
+
+Pillar 5: Community & Content (Engagement)
+This relies on WebSockets and contextual content delivery mechanisms.
+
+
+"Due Date" Group Orchestration: The system must automatically assign users to anonymous chat groups based on their calculated due date month (e.g., "March 2026 Moms").
+
+
+Channel-Based Chatting: Within the due date groups, the system must support threaded topic channels for specific discussions (e.g., "C-Section Recovery", "Name Suggestions").
+
+
+Contextual Expert Content Delivery: The system must serve verified medical articles and short-form video clips that are specifically mapped to the user's current gestational week or postnatal month.

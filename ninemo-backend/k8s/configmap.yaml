@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ninemo-config
+  namespace: ninemo
+data:
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  POSTGRES_HOST: "postgres-service"
+  POSTGRES_PORT: "5432"
+  MONGODB_HOST: "mongodb-service"
+  MONGODB_PORT: "27017"
+  KAFKA_BROKERS: "kafka-service:9092"
+  RABBITMQ_HOST: "rabbitmq-service"
+  RABBITMQ_PORT: "5672"
+  ZIPKIN_ENDPOINT: "http://zipkin-service:9411/api/v2/spans"
+  ABDM_BASE_URL: "https://live.abdm.gov.in"
+  IDENTITY_SERVICE_URL: "http://identity-abha-service:8081"
+  HEALTH_DATA_SERVICE_URL: "http://health-data-service:8082"
+  AI_PARSING_SERVICE_URL: "http://ai-parsing-service:8083"
+  NINEMO_CLINICAL_SERVICE_URL: "http://ninemo-clinical-service:8084"
+  NOTIFICATION_SERVICE_URL: "http://notification-service:8085"
+  COMMUNITY_SERVICE_URL: "http://ninemo-community-service:8086"

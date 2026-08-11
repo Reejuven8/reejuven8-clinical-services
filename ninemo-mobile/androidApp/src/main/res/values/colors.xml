@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Berry palette (extracted from the imported Claude Design mockups). -->
+    <color name="ninemo_primary">#9C4276</color>
+    <color name="ninemo_surface">#FDF7FB</color>
+    <color name="ninemo_on_surface">#211A1E</color>
+    <color name="white">#FFFFFF</color>
+</resources>

@@ -1,0 +1,31 @@
+server:
+  port: 8086
+spring:
+  application:
+    name: ninemo-community-service
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://reejuven8:dev_password@localhost:27017/reejuven8?authSource=admin}
+jwt:
+  secret: ${JWT_SECRET:ninemo-dev-secret-key-change-in-production-minimum-256-bits}
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_ENDPOINT:http://localhost:9411/api/v2/spans}

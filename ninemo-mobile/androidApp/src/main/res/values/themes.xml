@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base app theme. Compose drives real theming (NineMoTheme); this seeds the
+         window background (berry-tinted surface) and status/nav bar before Compose loads. -->
+    <style name="Theme.NineMo" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/ninemo_surface</item>
+        <item name="android:statusBarColor">@color/ninemo_surface</item>
+        <item name="android:navigationBarColor">@color/ninemo_surface</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

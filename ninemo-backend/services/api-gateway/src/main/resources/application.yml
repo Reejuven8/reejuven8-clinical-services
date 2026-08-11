@@ -1,0 +1,133 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:dev_password}
+  cloud:
+    gateway:
+      # ROUTE ORDERING RULE (NM-B-174 / IS-035): Spring Cloud Gateway matches routes by
+      # `order` (ascending), and falls back to definition order only for equal orders —
+      # which is fragile. Every route therefore declares an explicit order:
+      #   -10 = specific path that is a prefix-subset of a broader route (must win)
+      #    10 = ordinary non-overlapping service route
+      #    20 = broad catch-all-ish route that a -10 route carves out of
+      # Current overlap audit: /api/v1/ninemo/community/** ⊂ /api/v1/ninemo/** is the only
+      # one. identity / health / ai / notifications / ws paths are mutually disjoint.
+      routes:
+        - id: identity-abha-service
+          uri: ${IDENTITY_SERVICE_URL:http://localhost:8081}
+          order: 10
+          predicates:
+            - Path=/api/v1/identity/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: identity-cb
+                fallbackUri: forward:/fallback
+
+        - id: health-data-service
+          uri: ${HEALTH_DATA_SERVICE_URL:http://localhost:8082}
+          order: 10
+          predicates:
+            - Path=/api/v1/health/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: health-cb
+                fallbackUri: forward:/fallback
+
+        - id: ai-parsing-service
+          uri: ${AI_PARSING_SERVICE_URL:http://localhost:8083}
+          order: 10
+          predicates:
+            - Path=/api/v1/ai/**
+
+        # Broad: /api/v1/ninemo/** — community carves /api/v1/ninemo/community/** out of it.
+        - id: ninemo-clinical-service
+          uri: ${NINEMO_CLINICAL_SERVICE_URL:http://localhost:8084}
+          order: 20
+          predicates:
+            - Path=/api/v1/ninemo/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: ninemo-cb
+                fallbackUri: forward:/fallback
+
+        - id: notification-service
+          uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8085}
+          order: 10
+          predicates:
+            - Path=/api/v1/notifications/**
+
+        # Must beat the broader ninemo-clinical-service route (Path=/api/v1/ninemo/**),
+        # which otherwise swallows /ninemo/community/** and forwards it to clinical
+        # (:8084) → circuit-breaker 503. See IS-035.
+        - id: ninemo-community-service-rest
+          uri: ${COMMUNITY_SERVICE_URL:http://localhost:8086}
+          order: -10
+          predicates:
+            - Path=/api/v1/ninemo/community/**
+
+        - id: ninemo-community-service-ws
+          uri: ${COMMUNITY_SERVICE_URL:http://localhost:8086}
+          order: 10
+          predicates:
+            - Path=/ws/**
+
+      default-filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 100
+            redis-rate-limiter.burstCapacity: 150
+            key-resolver: "#{@ipKeyResolver}"
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+
+jwt:
+  secret: ${JWT_SECRET:ninemo-dev-secret-key-change-in-production-minimum-256-bits}
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      identity-cb:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+      health-cb:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+      ninemo-cb:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_ENDPOINT:http://localhost:9411/api/v2/spans}

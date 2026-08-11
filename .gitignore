@@ -1,0 +1,24 @@
+# Added by code-review-graph
+.code-review-graph/
+
+# Python
+.venv/
+__pycache__/
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+
+# Node
+node_modules/
+dist/
+build/
+
+# OS
+.DS_Store
+
+# IDEs / Configs
+.idea/
+*.iml
