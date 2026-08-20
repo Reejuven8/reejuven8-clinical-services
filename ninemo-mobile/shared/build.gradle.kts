@@ -36,6 +36,12 @@ kotlin {
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.serialization.json)
             implementation(libs.koin.core)
+            implementation("io.insert-koin:koin-core-viewmodel:${libs.versions.koin.get()}") {
+                // lifecycle-viewmodel-savedstate:2.8.7's iOS variant wrongly declares a
+                // kotlinx-coroutines-android dependency (JVM-only artifact) — breaks KMP
+                // native resolution. Excluded; savedstate isn't used off Android anyway.
+                exclude(group = "androidx.lifecycle", module = "lifecycle-viewmodel-savedstate")
+            }
             implementation(libs.krossbow.stomp)
         }
         commonTest.dependencies {

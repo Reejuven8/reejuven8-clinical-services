@@ -34,6 +34,12 @@ ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 
 # Koin
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+# viewModelOf/org.koin.core.module.dsl.viewModelOf lives in io.insert-koin:koin-core-viewmodel
+# on KMP — koin-core alone doesn't carry it, which broke iOS/native compilation (IS-021).
+# Declared as a raw coordinate string in shared/build.gradle.kts (not here) because it needs
+# an exclude() on lifecycle-viewmodel-savedstate, and Gradle won't let a version-catalog
+# "minimal dependency" be reconfigured with one. koin-android already pulls its own
+# viewmodel support transitively for the Android target.
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
 
