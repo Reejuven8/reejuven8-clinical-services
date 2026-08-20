@@ -34,6 +34,7 @@ data class ClubResponse(
     val dueDateMonth: String,
     val memberCount: Int = 0,
     @SerialName("member") val isMember: Boolean = false,
+    val callerAlias: String? = null,
     val members: List<ClubMember> = emptyList(),
     val channels: List<Channel> = emptyList(),
 )

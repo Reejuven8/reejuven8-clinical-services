@@ -12,6 +12,7 @@ public class ClubResponse {
     private String dueDateMonth;
     private int memberCount;
     private boolean isMember;
+    private String callerAlias;
     private List<ChannelDto> channels;
 
     @Data @Builder

@@ -133,7 +133,7 @@ private fun ClubCard(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             club.channels.forEach { channel ->
-                ChannelChip(channel) { onOpenChannel(club.id, channel.channelId, channel.name, null) }
+                ChannelChip(channel) { onOpenChannel(club.id, channel.channelId, channel.name, club.callerAlias) }
             }
         }
     }

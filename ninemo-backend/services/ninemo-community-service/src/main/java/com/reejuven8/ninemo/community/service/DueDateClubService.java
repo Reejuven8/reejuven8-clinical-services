@@ -72,14 +72,18 @@ public class DueDateClubService {
     }
 
     private ClubResponse toResponse(DueDateClub club, String userId) {
-        boolean isMember = club.getMembers().stream()
-            .anyMatch(m -> m.getUserId().equals(userId));
+        String callerAlias = club.getMembers().stream()
+            .filter(m -> m.getUserId().equals(userId))
+            .map(DueDateClub.Member::getAlias)
+            .findFirst()
+            .orElse(null);
         return ClubResponse.builder()
             .id(club.getId())
             .clubName(club.getClubName())
             .dueDateMonth(club.getDueDateMonth())
             .memberCount(club.getMemberCount() != null ? club.getMemberCount() : 0)
-            .isMember(isMember)
+            .isMember(callerAlias != null)
+            .callerAlias(callerAlias)
             .channels(club.getChannels().stream()
                 .map(ch -> ClubResponse.ChannelDto.builder()
                     .channelId(ch.getChannelId())
