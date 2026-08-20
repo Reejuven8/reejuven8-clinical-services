@@ -1,6 +1,7 @@
 package com.reejuven8.identity.service;
 
 import com.reejuven8.common.event.ConsentGrantedEvent;
+import com.reejuven8.common.exception.ForbiddenException;
 import com.reejuven8.common.exception.ResourceNotFoundException;
 import com.reejuven8.common.exception.UnauthorizedException;
 import com.reejuven8.identity.model.dto.ConsentRequest;
@@ -8,6 +9,7 @@ import com.reejuven8.identity.model.dto.ConsentResponse;
 import com.reejuven8.identity.model.entity.User;
 import com.reejuven8.identity.model.entity.UserConsent;
 import com.reejuven8.identity.model.enums.ConsentStatus;
+import com.reejuven8.identity.model.enums.UserRole;
 import com.reejuven8.identity.repository.UserConsentRepository;
 import com.reejuven8.identity.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,9 @@ public class ConsentService {
             .orElseThrow(() -> new ResourceNotFoundException("User", patientId.toString()));
         User doctor = userRepository.findById(UUID.fromString(request.doctorId()))
             .orElseThrow(() -> new ResourceNotFoundException("User", request.doctorId()));
+        if (doctor.getRole() != UserRole.DOCTOR) {
+            throw new ForbiddenException("Target user is not a doctor");
+        }
 
         UserConsent consent = UserConsent.builder()
             .patient(patient)
@@ -80,10 +85,12 @@ public class ConsentService {
     }
 
     private ConsentResponse toResponse(UserConsent c) {
+        User doctor = c.getDoctor();
         return new ConsentResponse(
             c.getId(),
             c.getPatient().getId(),
-            c.getDoctor().getId(),
+            doctor.getId(),
+            doctor.getFirstName() + " " + doctor.getLastName(),
             c.getConsentStatus(),
             c.getGrantedAt(),
             c.getExpiresAt(),

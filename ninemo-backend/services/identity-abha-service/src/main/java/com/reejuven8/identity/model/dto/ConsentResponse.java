@@ -8,6 +8,7 @@ public record ConsentResponse(
     UUID id,
     UUID patientId,
     UUID doctorId,
+    String doctorName,
     ConsentStatus consentStatus,
     Instant grantedAt,
     Instant expiresAt,

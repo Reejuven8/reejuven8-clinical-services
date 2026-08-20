@@ -30,6 +30,9 @@ object ApiRoutes {
     const val CONSENT_LIST = "$CONSENT/list"
     fun consentRevoke(id: String) = "$CONSENT/revoke/$id"
 
+    // Doctors
+    const val DOCTOR_SEARCH = "$IDENTITY/doctors/search" // ?phoneNumber=
+
     // Health records / files
     const val RECORDS = "$HEALTH/records" // ?page=&size= -> ApiResponse<SpringPage<HealthRecordResponse>>
     fun record(id: String) = "$HEALTH/records/$id"

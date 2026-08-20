@@ -37,6 +37,7 @@ import com.reejuven8.ninemo.android.ui.components.ErrorView
 import com.reejuven8.ninemo.android.ui.components.LoadingSpinner
 import com.reejuven8.ninemo.android.ui.components.NineMoButton
 import com.reejuven8.ninemo.shared.model.ConsentResponse
+import com.reejuven8.ninemo.shared.model.DoctorSummaryResponse
 import com.reejuven8.ninemo.shared.viewmodel.ConsentViewModel
 import com.reejuven8.ninemo.shared.viewmodel.UiState
 import com.reejuven8.ninemo.shared.viewmodel.displayStatus
@@ -60,6 +61,7 @@ fun ConsentManagerScreen(onBack: () -> Unit) {
     val vm: ConsentViewModel = koinViewModel()
     val consentsState by vm.consents.collectAsStateWithLifecycle()
     val grantState by vm.grantState.collectAsStateWithLifecycle()
+    val doctorSearchState by vm.doctorSearch.collectAsStateWithLifecycle()
     val nowIso = remember { Clock.System.now().toString() }
 
     var showGrantForm by remember { mutableStateOf(false) }
@@ -106,8 +108,10 @@ fun ConsentManagerScreen(onBack: () -> Unit) {
         if (showGrantForm) {
             GrantForm(
                 grantState = grantState,
+                doctorSearchState = doctorSearchState,
+                onSearch = { phone -> vm.searchDoctor(phone) },
                 onSubmit = { doctorId, days -> vm.grant(doctorId, days) },
-                onCancel = { showGrantForm = false; vm.resetGrantState() },
+                onCancel = { showGrantForm = false; vm.resetGrantState(); vm.resetDoctorSearch() },
             )
         } else {
             NineMoButton(
@@ -116,7 +120,7 @@ fun ConsentManagerScreen(onBack: () -> Unit) {
                 modifier = Modifier.padding(top = 18.dp),
             )
             Text(
-                "You'll need the doctor's NineMo ID and choose a duration.",
+                "You'll need the doctor's phone number and choose a duration.",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
@@ -141,7 +145,7 @@ private fun ConsentCard(consent: ConsentResponse, nowIso: String, onRevoke: () -
             .padding(16.dp, 18.dp),
     ) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Text("Doctor ${consent.doctorId.take(8)}…", style = MaterialTheme.typography.bodyLarge)
+            Text(consent.doctorName, style = MaterialTheme.typography.bodyLarge)
             Text(
                 status,
                 style = MaterialTheme.typography.labelSmall,
@@ -174,11 +178,14 @@ private fun ConsentCard(consent: ConsentResponse, nowIso: String, onRevoke: () -
 @Composable
 private fun GrantForm(
     grantState: UiState<ConsentResponse>,
+    doctorSearchState: UiState<DoctorSummaryResponse>,
+    onSearch: (String) -> Unit,
     onSubmit: (String, Int) -> Unit,
     onCancel: () -> Unit,
 ) {
-    var doctorId by remember { mutableStateOf("") }
+    var phoneNumber by remember { mutableStateOf("") }
     var duration by remember { mutableIntStateOf(90) }
+    val resolvedDoctor = (doctorSearchState as? UiState.Success)?.data
 
     Column(
         Modifier
@@ -187,17 +194,41 @@ private fun GrantForm(
             .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(20.dp))
             .padding(18.dp),
     ) {
-        OutlinedTextField(
-            value = doctorId,
-            onValueChange = { doctorId = it },
-            label = { Text("Doctor's NineMo ID") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium,
-        )
-        Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            DurationOptions.forEach { days ->
-                FilterChip(selected = duration == days, onClick = { duration = days }, label = { Text("${days}d") })
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            OutlinedTextField(
+                value = phoneNumber,
+                onValueChange = { phoneNumber = it },
+                label = { Text("Doctor's phone number") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                modifier = Modifier.weight(1f),
+                shape = MaterialTheme.shapes.medium,
+            )
+            NineMoButton(
+                text = "Find",
+                onClick = { onSearch(phoneNumber) },
+                loading = doctorSearchState is UiState.Loading,
+                enabled = phoneNumber.isNotBlank(),
+                modifier = Modifier.padding(start = 8.dp),
+            )
+        }
+        if (doctorSearchState is UiState.Error) {
+            Text(
+                "No doctor found with that number.",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+        }
+        if (resolvedDoctor != null) {
+            Text(
+                "Dr. ${resolvedDoctor.firstName} ${resolvedDoctor.lastName} · ${resolvedDoctor.specialization}",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 10.dp),
+            )
+            Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                DurationOptions.forEach { days ->
+                    FilterChip(selected = duration == days, onClick = { duration = days }, label = { Text("${days}d") })
+                }
             }
         }
         if (grantState is UiState.Error) {
@@ -211,9 +242,9 @@ private fun GrantForm(
         Row(Modifier.padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             NineMoButton(
                 text = "Grant",
-                onClick = { onSubmit(doctorId, duration) },
+                onClick = { resolvedDoctor?.let { onSubmit(it.id, duration) } },
                 loading = grantState is UiState.Loading,
-                enabled = doctorId.isNotBlank(),
+                enabled = resolvedDoctor != null,
                 modifier = Modifier.weight(1f),
             )
             NineMoButton(text = "Cancel", onClick = onCancel, modifier = Modifier.weight(1f))

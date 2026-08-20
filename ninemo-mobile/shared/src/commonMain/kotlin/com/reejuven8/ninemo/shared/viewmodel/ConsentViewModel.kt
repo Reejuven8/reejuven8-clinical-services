@@ -3,6 +3,7 @@ package com.reejuven8.ninemo.shared.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.reejuven8.ninemo.shared.model.ConsentResponse
+import com.reejuven8.ninemo.shared.model.DoctorSummaryResponse
 import com.reejuven8.ninemo.shared.repository.ConsentRepository
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
@@ -13,8 +14,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /**
- * P9 — Consent Manager. No doctor search/lookup endpoint exists backend-side — grant flow
- * takes the doctor's raw NineMo ID directly, matching the design mockup's manual-entry flow.
+ * P9 — Consent Manager. Grant flow resolves a doctor by phone number via
+ * GET /identity/doctors/search (NM-B-168) instead of requiring the raw NineMo ID.
  * consentStatus never auto-flips to EXPIRED server-side, so [displayStatus] compares
  * expiresAt itself for GRANTED-but-past-expiry consents (rendering already-provided data).
  */
@@ -26,8 +27,26 @@ class ConsentViewModel(private val repository: ConsentRepository) : ViewModel() 
     private val _grantState = MutableStateFlow<UiState<ConsentResponse>>(UiState.Empty)
     val grantState: StateFlow<UiState<ConsentResponse>> = _grantState.asStateFlow()
 
+    private val _doctorSearch = MutableStateFlow<UiState<DoctorSummaryResponse>>(UiState.Empty)
+    val doctorSearch: StateFlow<UiState<DoctorSummaryResponse>> = _doctorSearch.asStateFlow()
+
     init {
         load()
+    }
+
+    fun searchDoctor(phoneNumber: String) {
+        if (phoneNumber.isBlank()) return
+        viewModelScope.launch {
+            _doctorSearch.value = UiState.Loading
+            repository.searchDoctorByPhone(phoneNumber).fold(
+                onSuccess = { _doctorSearch.value = UiState.Success(it) },
+                onFailure = { _doctorSearch.value = UiState.Error(it) },
+            )
+        }
+    }
+
+    fun resetDoctorSearch() {
+        _doctorSearch.value = UiState.Empty
     }
 
     fun load() {

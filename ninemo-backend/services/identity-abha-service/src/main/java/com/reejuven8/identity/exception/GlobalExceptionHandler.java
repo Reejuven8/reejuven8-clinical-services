@@ -2,6 +2,7 @@ package com.reejuven8.identity.exception;
 
 import com.reejuven8.common.dto.ApiResponse;
 import com.reejuven8.common.dto.ErrorResponse;
+import com.reejuven8.common.exception.ForbiddenException;
 import com.reejuven8.common.exception.ResourceNotFoundException;
 import com.reejuven8.common.exception.UnauthorizedException;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ApiResponse<Void>> handleUnauthorized(UnauthorizedException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(ApiResponse.error(ErrorResponse.of(ex.getErrorCode(), ex.getMessage())));
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ApiResponse<Void>> handleForbidden(ForbiddenException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
             .body(ApiResponse.error(ErrorResponse.of(ex.getErrorCode(), ex.getMessage())));
     }
 

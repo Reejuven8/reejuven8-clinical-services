@@ -70,9 +70,8 @@ data class DeviceRegistrationRequest(
 
 // ─── Consent (verified against ConsentController/ConsentRequest/ConsentResponse.java) ──
 // No durationDays server-side — client computes an absolute expiresAt and sends that.
-// No doctor search/lookup endpoint exists anywhere in identity-abha-service; the caller
-// must already have the doctor's raw user UUID (matches the design mockup's "doctor's
-// NineMo ID" manual-entry flow, so no gap vs the UI spec — just vs the mobile stub).
+// GET /identity/doctors/search?phoneNumber= (DoctorController) resolves a doctor's UUID +
+// display name from their phone number — added for NM-B-168, closes the raw-UUID-entry gap.
 @Serializable
 data class ConsentGrantRequest(
     val doctorId: String,
@@ -88,10 +87,21 @@ data class ConsentResponse(
     val id: String,
     val patientId: String,
     val doctorId: String,
+    val doctorName: String,
     val consentStatus: String, // GRANTED | REVOKED | EXPIRED (server enum; EXPIRED never actually set)
     val grantedAt: String,
     val expiresAt: String,
     val revokedAt: String? = null,
+)
+
+// GET /identity/doctors/search?phoneNumber= — 404 if no doctor (or no user at all) has that number.
+@Serializable
+data class DoctorSummaryResponse(
+    val id: String,
+    val firstName: String,
+    val lastName: String,
+    val specialization: String,
+    val qualifications: String,
 )
 
 // ─── Health records (verified against HealthRecordController/FhirResourceResponse.java)
