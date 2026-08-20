@@ -16,8 +16,12 @@ node_modules/
 dist/
 build/
 
-# Gradle
+# Gradle / Kotlin / Android
 .gradle/
+.kotlin/
+local.properties
+.cxx/
+captures/
 
 # OS
 .DS_Store
