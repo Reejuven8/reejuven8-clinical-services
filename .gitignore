@@ -16,6 +16,9 @@ node_modules/
 dist/
 build/
 
+# Gradle
+.gradle/
+
 # OS
 .DS_Store
 
