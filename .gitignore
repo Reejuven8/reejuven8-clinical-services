@@ -29,3 +29,4 @@ captures/
 # IDEs / Configs
 .idea/
 *.iml
+.vscode/
