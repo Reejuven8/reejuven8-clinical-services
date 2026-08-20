@@ -1,5 +1,7 @@
 package com.reejuven8.ninemo.android.navigation
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -63,7 +65,14 @@ private fun AuthNavHost(session: SessionViewModel) {
     val isAuthenticated by session.isAuthenticated.collectAsStateWithLifecycle()
     val hasCompletedOnboarding by session.hasCompletedOnboarding.collectAsStateWithLifecycle()
 
-    NavHost(navController = nav, startDestination = Routes.Splash) {
+    NavHost(
+        navController = nav,
+        startDestination = Routes.Splash,
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None },
+    ) {
         composable<Routes.Splash> {
             SplashScreen(
                 isAuthenticated = isAuthenticated,
@@ -137,6 +146,10 @@ private fun MainShell(session: SessionViewModel) {
             navController = nav,
             startDestination = Routes.Home,
             modifier = Modifier.padding(padding),
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None },
+            popEnterTransition = { EnterTransition.None },
+            popExitTransition = { ExitTransition.None },
         ) {
             composable<Routes.Home> {
                 val childId = activeChildId
